@@ -1,4 +1,13 @@
+using Microsoft.EntityFrameworkCore;
+using WorkTracker.Api.Data;
+
 var builder = WebApplication.CreateBuilder(args);
+
+var connectionString =
+    builder.Configuration.GetConnectionString("WorkTracker") ?? throw new InvalidOperationException("Connection string 'WorkTracker' was not found.");
+
+builder.Services.AddDbContext<WorkTrackerDbContext>(options =>
+    options.UseSqlServer(connectionString));
 
 // Add services to the container.
 

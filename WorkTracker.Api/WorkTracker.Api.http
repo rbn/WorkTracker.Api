@@ -4,3 +4,13 @@ GET {{WorkTracker.Api_HostAddress}}/weatherforecast/
 Accept: application/json
 
 ###
+
+POST https://localhost:7055/api/workitems
+Content-Type: application/json
+
+{
+  "title": "Learn POST",
+  "description": "Create a work item through the API",
+  "isComplete": false,
+  "createdAt": "2026-09-16T17:30:00"
+}

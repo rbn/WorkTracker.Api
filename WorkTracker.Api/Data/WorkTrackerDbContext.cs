@@ -1,12 +1,12 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using WorkTracker.Api.Models;
 
 namespace WorkTracker.Api.Data
 {
-    public class WorkTrackerDbContext : DbContext
+    public class WorkTrackerDbContext(DbContextOptions<WorkTrackerDbContext> options)
+    : DbContext(options)
     {
-        public WorkTrackerDbContext(DbContextOptions<WorkTrackerDbContext> options) : base(options)
-        {
-        }
-        public DbSet<Models.WorkItem> WorkItems { get; set; }
+        public DbSet<WorkItem> WorkItems { get; set; }
     }
 }
+
