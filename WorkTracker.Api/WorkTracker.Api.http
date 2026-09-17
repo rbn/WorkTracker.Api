@@ -1,4 +1,4 @@
-@WorkTracker.Api_HostAddress = http://localhost:5142
+@WorkTracker.Api_HostAddress = https://localhost:7055
 
 GET {{WorkTracker.Api_HostAddress}}/weatherforecast/
 Accept: application/json
@@ -13,4 +13,58 @@ Content-Type: application/json
   "description": "Create a work item through the API",
   "isComplete": false,
   "createdAt": "2026-09-16T17:30:00"
+}
+
+###
+
+PUT https://localhost:7055/api/workitems/2
+Content-Type: application/json
+
+{
+  "title": "Learn PUT",
+  "description": "Update a work item through the API",
+  "isComplete": true,
+  "createdAt": "2026-09-16T17:30:00"
+}
+
+###
+
+Delete https://localhost:7055/api/workitems/2
+Content-Type: application/json
+{
+}
+
+###
+
+POST {{WorkTracker.Api_HostAddress}}/api/workitems
+Content-Type: application/json
+
+{
+  "title": "Valid Title",
+  "description": "Check for POST operation",
+  "isComplete": true
+
+}
+
+###
+PUT https://localhost:7055/api/workitems/2
+Content-Type: application/json
+
+{
+  "title": "",
+  "description": "Invalid title - should return 400",
+  "isComplete": true,
+  "createdAt": "2026-09-16T17:30:00"
+}
+
+###
+
+POST {{WorkTracker.Api_HostAddress}}/api/workitems
+Content-Type: application/json
+
+{
+  "title": "Title too long -----------------------------------------------------------------------------------------------------------------------------------------------------------------------------"",
+  "description": "Check for POST operation",
+  "isComplete": false
+
 }
