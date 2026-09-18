@@ -1,9 +1,7 @@
 ﻿using Azure.Core;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using WorkTracker.Api.Data;
 using WorkTracker.Api.Dtos;
-using WorkTracker.Api.Models;
+using WorkTracker.Api.Services;
 
 namespace WorkTracker.Api.Controllers;
 
@@ -11,11 +9,11 @@ namespace WorkTracker.Api.Controllers;
 [Route("api/[controller]")]
 public class WorkItemsController : ControllerBase
 {
-    private readonly WorkTrackerDbContext _context;
+    private readonly IWorkItemService _workItemService;
 
-    public WorkItemsController(WorkTrackerDbContext context)
+    public WorkItemsController(IWorkItemService workItemService)
     {
-        _context = context;
+        _workItemService = workItemService;
     }
 
     [HttpGet]
@@ -25,7 +23,7 @@ public class WorkItemsController : ControllerBase
         // Read all rows asynchronously.
         // Return them with Ok(...).
 
-        var workitems = await _context.WorkItems.ToListAsync();
+        var workitems = await _workItemService.GetAllAsync();
         return Ok(workitems);
     }
 
@@ -37,12 +35,12 @@ public class WorkItemsController : ControllerBase
         // 2. If it doesn't exist, return NotFound().
         // 3. Otherwise return Ok(workItem).
 
-        var workItem = await _context.WorkItems.FirstOrDefaultAsync(x => x.Id == id);
+        var workItem = await _workItemService.GetByIdAsync(id);
+
         if (workItem == null)
         {
             return NotFound();
         }
-
         return Ok(workItem);
     }
 
@@ -53,21 +51,11 @@ public class WorkItemsController : ControllerBase
         // 2. Save changes asynchronously
         // 3. Return an appropriate response
 
-        var workItem = new WorkItem
-        {
-            Title = request.Title,
-            Description = request.Description,
-            IsComplete = false,
-            CreatedAt = DateTime.UtcNow
-        };
-
-        _context.WorkItems.Add(workItem);
-        await _context.SaveChangesAsync();
-
+        var createdWorkItem = await _workItemService.CreateAsync(request);
         return CreatedAtAction(
            nameof(GetById),
-           new { id = workItem.Id },
-           workItem);
+           new { id = createdWorkItem.Id },
+           createdWorkItem);
     }
 
     [HttpPut("{id}")]
@@ -78,36 +66,25 @@ public class WorkItemsController : ControllerBase
         // 3. Copy the fields you want to allow updating.
         // 4. SaveChangesAsync().
         // 5. Return NoContent().
-        var existingWorkItem = await
-            _context.WorkItems.FindAsync(id);
+        var existingWorkItem = await _workItemService.UpdateAsync(id, request);
+
         if (existingWorkItem == null)
         {
             return NotFound();
         }
-
-        existingWorkItem.Title = request.Title;
-        existingWorkItem.Description = request.Description;
-        existingWorkItem.IsComplete = request.IsComplete;
-
-        await _context.SaveChangesAsync();
         return NoContent();
     }
 
     [HttpDelete("{id}")]
     public async Task<IActionResult> Delete(int id)
     {
-        // Find
-        // NotFound if missing
-        // Remove
-        // Save
-        // Return NoContent
-        var existingWorkItem = await _context.WorkItems.FindAsync(id);
-        if (existingWorkItem == null)
+        var deletedWorkItem = await _workItemService.DeleteAsync(id);
+
+        if (deletedWorkItem == null)
         {
             return NotFound();
         }
-        _context.WorkItems.Remove(existingWorkItem);
-        await _context.SaveChangesAsync();
+
         return NoContent();
     }
 }

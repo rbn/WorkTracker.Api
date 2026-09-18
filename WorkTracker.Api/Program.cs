@@ -1,5 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using WorkTracker.Api.Data;
+using WorkTracker.Api.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -10,6 +11,7 @@ builder.Services.AddDbContext<WorkTrackerDbContext>(options =>
     options.UseSqlServer(connectionString));
 
 // Add services to the container.
+builder.Services.AddScoped<IWorkItemService, WorkItemService>();
 
 builder.Services.AddControllers();
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi

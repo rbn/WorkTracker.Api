@@ -1,3 +1,4 @@
 <Solution>
   <Project Path="WorkTracker.Api/WorkTracker.Api.csproj" />
+  <Project Path="WorkTracker.Tests/WorkTracker.Tests.csproj" Id="23d3b90d-4aca-453f-84a9-56dba0dd88ea" />
 </Solution>
