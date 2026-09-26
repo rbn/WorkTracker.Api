@@ -1,14 +1,6 @@
 import { useEffect, useState } from 'react'
 import type { SyntheticEvent } from 'react'
-
-
-type WorkItem = {
-  id: number
-  title: string
-  description: string
-  isComplete: boolean
-  createdAt: string
-}
+import { getWorkItems, type WorkItem } from './api/workItemsApi'
 
 function App() {
   const [workItems, setWorkItems] = useState<WorkItem[]>([])
@@ -16,23 +8,21 @@ function App() {
   const [description, setDescription] = useState('')
 
   useEffect(() => {
-    fetch('https://localhost:7055/api/workitems')
-      .then(response => response.json())
-      .then(data => setWorkItems(data))
+    getWorkItems().then(data => setWorkItems(data))
   }, [])
 
   async function handleSubmit(event: SyntheticEvent<HTMLFormElement>) {
-    event.preventDefault();
+    event.preventDefault()
 
     const response = await fetch('https://localhost:7055/api/workitems', {
       method: 'POST',
       headers: {
-        'Content-Type': 'application/json'
+        'Content-Type': 'application/json',
       },
       body: JSON.stringify({
         title,
-        description
-      })
+        description,
+      }),
     })
 
     if (!response.ok) {
@@ -46,33 +36,28 @@ function App() {
     setDescription('')
   }
   async function handleToggleComplete(item: WorkItem) {
-  const response = await fetch(
-    `https://localhost:7055/api/workitems/${item.id}`,
-    {
+    const response = await fetch(`https://localhost:7055/api/workitems/${item.id}`, {
       method: 'PUT',
       headers: {
-        'Content-Type': 'application/json'
+        'Content-Type': 'application/json',
       },
       body: JSON.stringify({
         title: item.title,
         description: item.description,
-        isComplete: !item.isComplete
-      })
+        isComplete: !item.isComplete,
+      }),
+    })
+
+    if (!response.ok) {
+      throw new Error('Failed to update work item')
     }
-  )
 
-  if (!response.ok) {
-    throw new Error('Failed to update work item')
-  }
-
-  setWorkItems(previousItems =>
-    previousItems.map(existing =>
-      existing.id === item.id
-        ? { ...existing, isComplete: !existing.isComplete }
-        : existing
+    setWorkItems(previousItems =>
+      previousItems.map(existing =>
+        existing.id === item.id ? { ...existing, isComplete: !existing.isComplete } : existing
+      )
     )
-  )
-}
+  }
 
   return (
     <div>
@@ -82,20 +67,14 @@ function App() {
         <div>
           <label>
             Title
-            <input
-              value={title}
-              onChange={e => setTitle(e.target.value)}
-            />
+            <input value={title} onChange={e => setTitle(e.target.value)} />
           </label>
         </div>
 
         <div>
           <label>
             Description
-            <input
-              value={description}
-              onChange={e => setDescription(e.target.value)}
-            />
+            <input value={description} onChange={e => setDescription(e.target.value)} />
           </label>
         </div>
 
@@ -106,12 +85,7 @@ function App() {
         {workItems.map(item => (
           <li key={item.id}>
             {item.title} - {item.isComplete ? 'Complete' : 'Open'}
-
-            <button
-              onClick={() => handleToggleComplete(item)}
-            >
-              Toggle
-            </button>
+            <button onClick={() => handleToggleComplete(item)}>Toggle</button>
           </li>
         ))}
       </ul>
